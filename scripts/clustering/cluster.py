@@ -120,7 +120,7 @@ class ClusterEvaluator:
         # A helper function to remove the stratification column from a list of columns
         def _exclude_strata_col(cols_list, strata_col):
             if strata_col and strata_col in cols_list:
-                print(f"ⓘ Excluding stratification column '{strata_col}' from scaling.")
+                print(f"Excluding stratification column '{strata_col}' from scaling.")
                 cols_list.remove(strata_col)
             return cols_list
 
@@ -141,7 +141,7 @@ class ClusterEvaluator:
             if scaled_rd_df is not None:
                 self.X_df = scaled_rd_df
                 self.X = self.X_df.values
-                print("✅ RD dataset scaling complete. self.X_df and self.X have been updated.")
+                print("RD dataset scaling complete. self.X_df and self.X have been updated.")
 
         if dataset_to_scale in ['pre_rd', 'both']:
             print("\n--- Scaling Original Pre-Reduction (pre-RD) Dataset ---")
@@ -159,7 +159,7 @@ class ClusterEvaluator:
             scaled_pre_rd_df = self._perform_scaling(self.X_pre_rd_df, 'scaler_pre_rd', final_cols_for_pre_rd)
             if scaled_pre_rd_df is not None:
                 self.X_pre_rd_df = scaled_pre_rd_df
-                print("✅ Pre-RD dataset scaling complete. self.X_pre_rd_df has been updated.")
+                print("Pre-RD dataset scaling complete. self.X_pre_rd_df has been updated.")
 
     def _perform_scaling(self, df_to_scale, scaler_attr_name, columns_to_scale):
         """Helper function to perform StandardScaler on a dataframe's numeric columns."""
@@ -273,16 +273,16 @@ class ClusterEvaluator:
         if features_to_use:
             missing_features = set(features_to_use) - set(X_data_df.columns)
             if missing_features:
-                print(f"⚠️ Warning: The following features for K-Prototypes were not found and will be ignored: {list(missing_features)}")
+                print(f"Warning: The following features for K-Prototypes were not found and will be ignored: {list(missing_features)}")
             
             valid_features = [f for f in features_to_use if f in X_data_df.columns]
 
             if not valid_features:
-                print("⛔ Error: No valid features found for K-Prototypes. Aborting evaluation.")
+                print("Error: No valid features found for K-Prototypes. Aborting evaluation.")
                 return pd.DataFrame()
 
             X_data_df = X_data_df[valid_features]
-            print(f"📊 Running K-Prototypes on a subset of {len(valid_features)} features.")
+            print(f"Running K-Prototypes on a subset of {len(valid_features)} features.")
 
         categorical_features_indices = [i for i, col in enumerate(X_data_df.columns) 
                                         if X_data_df[col].dtype == 'object' or X_data_df[col].dtype.name == 'category']
@@ -527,7 +527,7 @@ class ClusterEvaluator:
                 self.X_df['cluster_kprototypes'] = model.fit_predict(data_pre_rd.values, categorical=categorical_indices)
                 self.final_models['kprototypes'] = model
             
-        print("\n✅ Final models are trained and cluster labels are added to the DataFrame.")
+        print("\nFinal models are trained and cluster labels are added to the DataFrame.")
         return self.X_df
 
     # ==============================================================================
@@ -671,8 +671,7 @@ class ClusterEvaluator:
                 plot_idx += 1
             
             if 'cluster_kprototypes' in self.X_df.columns:
-                # K-Prototypes involves categorical data, which isn't suitable for violin plots.
-                # A count plot is more appropriate for showing distributions.
+                # A count plot for showing distributions.
                 print(f"Note: Violin plot for '{feature}' is only applicable if it is a numerical feature.")
 
 
@@ -917,8 +916,6 @@ class ClusterEvaluator:
         # --- Plotting ---
         fig, axs = plt.subplots(1, 3, figsize=(24, 7), sharex=True)
         fig.suptitle('Hierarchical Linkage Method Comparison', fontsize=16)
-        
-        # NEW: Added 'TWSS' to the list of metrics to plot
         metrics = ['TWSS', 'Silhouette Score', 'DBI Score']
         
         for ax, metric in zip(axs, metrics):
@@ -1205,7 +1202,7 @@ class ClusterEvaluator:
                 # 6. Calculate and store the Adjusted Rand Score
                 ari = adjusted_rand_score(true_target_labels, predicted_labels)
                 ari_scores[model_type] = ari
-                print(f"✅ Adjusted Rand Score (ARI) for {model_type.upper()}: {ari:.4f}")
+                print(f"Adjusted Rand Score (ARI) for {model_type.upper()}: {ari:.4f}")
 
             except Exception as e:
                 print(f"[ERROR] An unexpected error occurred while evaluating {model_type.upper()}: {e}")
@@ -1339,7 +1336,7 @@ class ClusterEvaluator:
                     mean_scores.append(np.mean(scores))
                     std_devs.append(np.std(scores))
 
-            # Create the bar chart 📊
+            # Create the bar chart 
             plt.figure(figsize=(12, 7))
             colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(plot_labels)))
             bars = plt.bar(plot_labels, mean_scores, yerr=std_devs, color=colors, capsize=5, alpha=0.85, edgecolor='black')
@@ -1399,7 +1396,7 @@ class ClusterEvaluator:
         source_data_common = source_data[common_features].copy()
         target_data_common = target_data[common_features].copy()
 
-        # <<< FIX: Apply the source scaler to the target data before prediction >>>
+        # Apply the source scaler to the target data before prediction
         if source_scaler:
             # Find which of the scaler's features are present in the target dataframe
             numeric_cols_to_transform = [col for col in source_scaler.feature_names_in_ if col in target_data_common.columns]
@@ -1607,7 +1604,7 @@ class ClusterEvaluator:
                     mean_scores.append(np.mean(scores))
                     std_devs.append(np.std(scores))
 
-            # Create the bar chart 📊
+            # Create the bar chart 
             plt.figure(figsize=(12, 7))
             colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(plot_labels)))
             bars = plt.bar(plot_labels, mean_scores, yerr=std_devs, color=colors, capsize=5, alpha=0.85, edgecolor='black')
@@ -1713,7 +1710,7 @@ class ClusterEvaluator:
                     mean_scores.append(np.mean(scores))
                     std_devs.append(np.std(scores))
 
-            # Create the bar chart 📊
+            # Create the bar chart 
             plt.figure(figsize=(10, 7))
             colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(plot_labels)))
             bars = plt.bar(plot_labels, mean_scores, yerr=std_devs, color=colors, capsize=5, alpha=0.85, edgecolor='black')
@@ -1908,7 +1905,6 @@ class ClusterEvaluator:
                 k = hyperparams[name].get('n_clusters') or hyperparams[name].get('n_components')
                 print(f"{name.capitalize()} (k={k}) Stability: Mean ARI = {np.mean(scores):.4f}, Std Dev = {np.std(scores):.4f}")
         
-        # --- MODIFIED PLOTTING SECTION ---
         if any(ari_scores.values()):
             # Prepare data for the bar chart
             plot_labels = []
@@ -1923,7 +1919,7 @@ class ClusterEvaluator:
                     mean_scores.append(np.mean(scores))
                     std_devs.append(np.std(scores))
 
-            # Create the bar chart 📊
+            # Create the bar chart
             plt.figure(figsize=(10, 7))
             colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(plot_labels)))
             bars = plt.bar(plot_labels, mean_scores, yerr=std_devs, color=colors, capsize=5, alpha=0.85, edgecolor='black')
@@ -2296,7 +2292,7 @@ class ClusterEvaluator:
                 if cramers_v_df is not None and not cramers_v_df.empty:
                     cramers_v_df.to_excel(writer, sheet_name=f'{alg.upper()} - Cramer\'s V')
         
-        print("\n✅ All analyses have been successfully exported.")
+        print("\nAll analyses have been successfully exported.")
 
     def generate_cluster_profiles(self, algorithm, categorical_mode='percentage'):
         """
@@ -2396,6 +2392,6 @@ class ClusterEvaluator:
                         sheet_name_cat = f'{algorithm.upper()} - Categorical'
                         categorical_profile.to_excel(writer, sheet_name=sheet_name_cat)
 
-            print(f"✅ All profiles successfully saved to '{filepath}'")
+            print(f"All profiles successfully saved to '{filepath}'")
         except Exception as e:
             print(f"Error: Could not save file. {e}")
